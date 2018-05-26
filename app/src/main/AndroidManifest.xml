@@ -38,7 +38,8 @@
         <activity
             android:name=".CvCameraActivity"
             android:configChanges="keyboardHidden|orientation"
-            android:screenOrientation="landscape">
+            android:screenOrientation="landscape"
+            android:theme="@android:style/Theme.Holo.NoActionBar.Fullscreen">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
 

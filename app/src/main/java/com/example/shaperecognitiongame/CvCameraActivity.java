@@ -77,9 +77,12 @@ public class CvCameraActivity extends Activity implements CvCameraViewListener2 
      */
     private static final boolean FIXED_FRAME_SIZE = true;
     /**
-     * Acceptable Width/Height ratio of circles
+     * Acceptable minimum area of detected contour
      */
     private static final double CONTOUR_MIN_AREA = 200;
+    /**
+     * Acceptable Width/Height ratio of circles
+     */
     private static final double CIRC_HW_RATIO = 0.05;
     /**
      * Acceptable radial and rectangular areas ratio of circles
