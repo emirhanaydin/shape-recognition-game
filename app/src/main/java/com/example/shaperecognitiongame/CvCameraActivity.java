@@ -7,6 +7,10 @@ import android.util.Log;
 import android.view.SurfaceView;
 import android.view.WindowManager;
 
+import com.example.shaperecognitiongame.shapes.Circle;
+import com.example.shaperecognitiongame.shapes.Shape;
+import com.example.shaperecognitiongame.shapes.ShapeHelper;
+
 import org.opencv.android.BaseLoaderCallback;
 import org.opencv.android.CameraBridgeViewBase;
 import org.opencv.android.CameraBridgeViewBase.CvCameraViewFrame;
@@ -60,10 +64,6 @@ public class CvCameraActivity extends Activity implements CvCameraViewListener2 
      */
     private static final Scalar HSV_HIGH_RED2 = new Scalar(179, 255, 255);
     /**
-     * definition of RGB red
-     */
-    private static final Scalar RGB_RED = new Scalar(255, 0, 0);
-    /**
      * frame size width
      */
     private static final int FRAME_SIZE_WIDTH = 640;
@@ -76,6 +76,15 @@ public class CvCameraActivity extends Activity implements CvCameraViewListener2 
      * 640 x 480
      */
     private static final boolean FIXED_FRAME_SIZE = true;
+    /**
+     * Acceptable Width/Height ratio of circles
+     */
+    private static final double CONTOUR_MIN_AREA = 200;
+    private static final double CIRC_HW_RATIO = 0.05;
+    /**
+     * Acceptable radial and rectangular areas ratio of circles
+     */
+    private static final double CIRC_RECT_AREA_RATIO = 0.05;
     /**
      * the camera view
      */
@@ -125,6 +134,8 @@ public class CvCameraActivity extends Activity implements CvCameraViewListener2 
      * approximated polygonal curve with specified precision
      */
     private MatOfPoint2f approxCurve;
+
+    private Shape mShapeToFind;
 
     private BaseLoaderCallback mLoaderCallback = new BaseLoaderCallback(this) {
         @Override
@@ -181,6 +192,9 @@ public class CvCameraActivity extends Activity implements CvCameraViewListener2 
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
         setContentView(R.layout.activity_cv_camera);
+
+        int verticesToFind = getIntent().getIntExtra(MainActivity.VERTICES_EXTRA, 0);
+        mShapeToFind = ShapeHelper.getShape(verticesToFind);
 
         mOpenCvCameraView = findViewById(R.id.java_camera_view);
         if (FIXED_FRAME_SIZE) {
@@ -301,56 +315,49 @@ public class CvCameraActivity extends Activity implements CvCameraViewListener2 
 
             Log.d(TAG, "vertices:" + numberVertices);
 
-            // ignore to small areas
-            if (Math.abs(contourArea) < 100) {
+            // ignore too small areas
+            if (Math.abs(contourArea) < CONTOUR_MIN_AREA) {
                 continue;
             }
 
-            // triangle detection
-            if (numberVertices == 3) {
-                setLabel(dst, "TRI", cnt);
-            }
+            boolean shapeFound = false;
 
-            // rectangle, pentagon and hexagon detection
-            if (numberVertices >= 4 && numberVertices <= 6) {
+            if (numberVertices == mShapeToFind.numberOfVertices()) {
+                if (numberVertices > 3) {
+                    List<Double> cos = new ArrayList<>();
+                    for (int j = 2; j < numberVertices + 1; j++) {
+                        cos.add(
+                                angle(
+                                        approxCurve.toArray()[j % numberVertices],
+                                        approxCurve.toArray()[j - 2],
+                                        approxCurve.toArray()[j - 1]
+                                )
+                        );
+                    }
+                    Collections.sort(cos);
 
-                List<Double> cos = new ArrayList<>();
-                for (int j = 2; j < numberVertices + 1; j++) {
-                    cos.add(
-                            angle(
-                                    approxCurve.toArray()[j % numberVertices],
-                                    approxCurve.toArray()[j - 2],
-                                    approxCurve.toArray()[j - 1]
-                            )
-                    );
-                }
-                Collections.sort(cos);
+                    double minCos = cos.get(0);
+                    double maxCos = cos.get(cos.size() - 1);
 
-                double mincos = cos.get(0);
-                double maxcos = cos.get(cos.size() - 1);
-
-                // rectangle detection
-                if (numberVertices == 4 && mincos >= -0.1 && maxcos <= 0.3) {
-                    setLabel(dst, "RECT", cnt);
-                }
-                // pentagon detection
-                else if (numberVertices == 5 && mincos >= -0.34 && maxcos <= -0.27) {
-                    setLabel(dst, "PENTA", cnt);
-                }
-                // hexagon detection
-                else if (numberVertices == 6 && mincos >= -0.55 && maxcos <= -0.45) {
-                    setLabel(dst, "HEXA", cnt);
-                }
+                    if (minCos >= mShapeToFind.minCos() && maxCos <= mShapeToFind.maxCos()) {
+                        shapeFound = true;
+                    }
+                } else
+                    shapeFound = true;
             }
             // circle detection
-            else {
+            else if (mShapeToFind instanceof Circle) {
                 Rect r = Imgproc.boundingRect(cnt);
                 int radius = r.width / 2;
 
-                if (Math.abs(1 - (r.width / r.height)) <= 0.2 &&
-                        Math.abs(1 - (contourArea / (Math.PI * radius * radius))) <= 0.2) {
-                    setLabel(dst, "CIR", cnt);
+                if (Math.abs(1 - ((double) r.width / r.height)) <= CIRC_HW_RATIO &&
+                        Math.abs(1 - (contourArea / (Math.PI * radius * radius))) <= CIRC_RECT_AREA_RATIO) {
+                    shapeFound = true;
                 }
+            }
+
+            if (shapeFound) {
+                setActiveDetection(dst, cnt);
             }
         }
 
@@ -362,23 +369,11 @@ public class CvCameraActivity extends Activity implements CvCameraViewListener2 
      * display a label in the center of the given contour (in the given image)
      *
      * @param im      the image to which the label is applied
-     * @param label   the label / text to display
      * @param contour the contour to which the label should apply
      */
-    private void setLabel(Mat im, String label, MatOfPoint contour) {
-        int fontFace = Core.FONT_HERSHEY_SIMPLEX;
-        double scale = 3; //0.4;
-        int thickness = 3; //1;
-        int[] baseline = new int[1];
-
-        Size text = Imgproc.getTextSize(label, fontFace, scale, thickness, baseline);
-        Rect r = Imgproc.boundingRect(contour);
-
-        Point pt = new Point(
-                r.x + ((r.width - text.width) / 2),
-                r.y + ((r.height + text.height) / 2)
-        );
-
-        Imgproc.putText(im, label, pt, fontFace, scale, RGB_RED, thickness);
+    private void setActiveDetection(Mat im, MatOfPoint contour) {
+        List<MatOfPoint> contours = new ArrayList<>();
+        contours.add(contour);
+        Imgproc.drawContours(im, contours, -1, new Scalar(242, 255, 0), 2);
     }
 }
