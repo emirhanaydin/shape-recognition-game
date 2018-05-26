@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Şekil Tanıma Oyunu</string>
+    <string name="shape_to_be_found">Bulunacak şekil</string>
+    <string name="search">ara</string>
+</resources>

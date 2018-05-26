@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">Shape Recognition Game</string>
+    <string name="shape_to_be_found">Shape to be found</string>
+    <string name="search">search</string>
 </resources>
