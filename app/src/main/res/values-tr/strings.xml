@@ -4,4 +4,6 @@
     <string name="shape_to_be_found">Bulunacak şekil</string>
     <string name="search">ara</string>
     <string name="shape_found">Sekil bulundu</string>
+    <string name="ok">TAMAM</string>
+    <string name="camera_access_required">Görüntü işleme için kamera izni gerekiyor</string>
 </resources>

@@ -3,4 +3,6 @@
     <string name="shape_to_be_found">Shape to be found</string>
     <string name="search">search</string>
     <string name="shape_found">Found shape</string>
+    <string name="ok">OK</string>
+    <string name="camera_access_required">Camera permission is required for image processing</string>
 </resources>
