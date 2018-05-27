@@ -83,11 +83,11 @@ public class CvCameraActivity extends Activity implements CvCameraViewListener2 
     /**
      * Acceptable Width/Height ratio of circles
      */
-    private static final double CIRC_HW_RATIO = 0.05;
+    private static final double CIRCLE_HW_RATIO = 0.05;
     /**
      * Acceptable radial and rectangular areas ratio of circles
      */
-    private static final double CIRC_RECT_AREA_RATIO = 0.05;
+    private static final double CIRCLE_RECT_AREA_RATIO = 0.05;
     /**
      * the camera view
      */
@@ -353,8 +353,8 @@ public class CvCameraActivity extends Activity implements CvCameraViewListener2 
                 Rect r = Imgproc.boundingRect(cnt);
                 int radius = r.width / 2;
 
-                if (Math.abs(1 - ((double) r.width / r.height)) <= CIRC_HW_RATIO &&
-                        Math.abs(1 - (contourArea / (Math.PI * radius * radius))) <= CIRC_RECT_AREA_RATIO) {
+                if (Math.abs(1 - ((double) r.width / r.height)) <= CIRCLE_HW_RATIO &&
+                        Math.abs(1 - (contourArea / (Math.PI * radius * radius))) <= CIRCLE_RECT_AREA_RATIO) {
                     shapeFound = true;
                 }
             }
