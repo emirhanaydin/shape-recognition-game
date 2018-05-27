@@ -9,8 +9,6 @@ import android.widget.ImageView;
 
 import com.example.shaperecognitiongame.shapes.ShapeHelper;
 
-import java.util.Random;
-
 public class MainActivity extends AppCompatActivity {
     public static final String VERTICES_EXTRA = "vertices_extra";
     public static final int NEW_GAME_REQUEST = 100;
@@ -42,8 +40,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void chooseNewShape() {
-        Random random = new Random();
-        mVertices = random.nextInt(6);
+        mVertices = ShapeHelper.getRandomShape().numberOfVertices();
 
         int shapeImage = ShapeHelper.getImageResource(mVertices);
         ImageView imageView = findViewById(R.id.imageView);

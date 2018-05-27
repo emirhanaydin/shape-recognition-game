@@ -2,6 +2,8 @@ package com.example.shaperecognitiongame.shapes;
 
 import com.example.shaperecognitiongame.R;
 
+import java.util.Random;
+
 public final class ShapeHelper {
     private static Shape[] shapes = new Shape[]{
             new Circle(),
@@ -28,6 +30,13 @@ public final class ShapeHelper {
             default:
                 return shapes[0];
         }
+    }
+
+    public static Shape getRandomShape() {
+        Random random = new Random();
+        int index = random.nextInt(shapes.length);
+
+        return shapes[index];
     }
 
     public static int getImageResource(int vertices) {
