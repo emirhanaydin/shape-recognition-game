@@ -329,28 +329,26 @@ public class CvCameraActivity extends Activity implements CvCameraViewListener2 
 
             boolean shapeFound = false;
 
+            // polygon detection
             if (numberVertices == mShapeToFind.numberOfVertices()) {
-                if (numberVertices > 3) {
-                    List<Double> cos = new ArrayList<>();
-                    for (int j = 2; j < numberVertices + 1; j++) {
-                        cos.add(
-                                angle(
-                                        approxCurve.toArray()[j % numberVertices],
-                                        approxCurve.toArray()[j - 2],
-                                        approxCurve.toArray()[j - 1]
-                                )
-                        );
-                    }
-                    Collections.sort(cos);
+                List<Double> cos = new ArrayList<>();
+                for (int j = 2; j < numberVertices + 1; j++) {
+                    cos.add(
+                            angle(
+                                    approxCurve.toArray()[j % numberVertices],
+                                    approxCurve.toArray()[j - 2],
+                                    approxCurve.toArray()[j - 1]
+                            )
+                    );
+                }
+                Collections.sort(cos);
 
-                    double minCos = cos.get(0);
-                    double maxCos = cos.get(cos.size() - 1);
+                double minCos = cos.get(0);
+                double maxCos = cos.get(cos.size() - 1);
 
-                    if (minCos >= mShapeToFind.minCos() && maxCos <= mShapeToFind.maxCos()) {
-                        shapeFound = true;
-                    }
-                } else
+                if (minCos >= mShapeToFind.minCos() && maxCos <= mShapeToFind.maxCos()) {
                     shapeFound = true;
+                }
             }
             // circle detection
             else if (mShapeToFind instanceof Circle) {

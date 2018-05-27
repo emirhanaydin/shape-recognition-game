@@ -3,12 +3,12 @@ package com.example.shaperecognitiongame.shapes;
 public class Triangle implements Shape {
     @Override
     public double minCos() {
-        return 0;
+        return Double.MIN_VALUE;
     }
 
     @Override
     public double maxCos() {
-        return 0;
+        return Double.MAX_VALUE;
     }
 
     @Override

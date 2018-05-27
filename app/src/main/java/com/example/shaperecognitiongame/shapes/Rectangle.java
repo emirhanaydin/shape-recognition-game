@@ -3,7 +3,7 @@ package com.example.shaperecognitiongame.shapes;
 public class Rectangle implements Shape {
     @Override
     public double minCos() {
-        return 0.1;
+        return -0.1;
     }
 
     @Override
