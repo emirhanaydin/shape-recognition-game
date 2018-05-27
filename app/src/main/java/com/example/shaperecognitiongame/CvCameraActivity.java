@@ -79,15 +79,19 @@ public class CvCameraActivity extends Activity implements CvCameraViewListener2 
     /**
      * Acceptable minimum area of detected contour
      */
-    private static final double CONTOUR_MIN_AREA = 200;
+    private static final double CONTOUR_MIN_AREA = 100;
     /**
      * Acceptable Width/Height ratio of circles
      */
-    private static final double CIRCLE_HW_RATIO = 0.05;
+    private static final double CIRCLE_HW_RATIO = 0.1;
     /**
      * Acceptable radial and rectangular areas ratio of circles
      */
-    private static final double CIRCLE_RECT_AREA_RATIO = 0.05;
+    private static final double CIRCLE_RECT_AREA_RATIO = 0.1;
+    private static final Scalar RGB_BLACK = new Scalar(0, 0, 0);
+    private static final Scalar RGB_WHITE = new Scalar(255, 255, 255);
+    private static final Scalar CONTOUR_COLOR = new Scalar(242, 255, 0);
+    private static final Scalar FOUND_TEXT_COLOR = new Scalar(81, 255, 101);
     /**
      * the camera view
      */
@@ -361,6 +365,7 @@ public class CvCameraActivity extends Activity implements CvCameraViewListener2 
 
             if (shapeFound) {
                 setActiveDetection(dst, cnt);
+                putText(dst, getResources().getString(R.string.shape_found));
             }
         }
 
@@ -377,6 +382,26 @@ public class CvCameraActivity extends Activity implements CvCameraViewListener2 
     private void setActiveDetection(Mat im, MatOfPoint contour) {
         List<MatOfPoint> contours = new ArrayList<>();
         contours.add(contour);
-        Imgproc.drawContours(im, contours, -1, new Scalar(242, 255, 0), 2);
+        Imgproc.drawContours(im, contours, -1, CONTOUR_COLOR, 2);
+    }
+
+    private void putText(Mat img, String text) {
+        final int fontFace = Core.FONT_HERSHEY_PLAIN;
+        final double fontScale = 3;
+        final int thickness = 2;
+        int[] baseLine = new int[1];
+
+        Size textSize = Imgproc.getTextSize(text, fontFace, fontScale, thickness, baseLine);
+
+        Point org = new Point(
+                (FRAME_SIZE_WIDTH - textSize.width) / 2,
+                FRAME_SIZE_HEIGHT - textSize.height);
+
+        // Black outermost outline
+        Imgproc.putText(img, text, org, fontFace, fontScale, RGB_BLACK, thickness + 4);
+        // White inner outline
+        Imgproc.putText(img, text, org, fontFace, fontScale, RGB_WHITE, thickness + 2);
+        // Text itself
+        Imgproc.putText(img, text, org, fontFace, fontScale, FOUND_TEXT_COLOR, thickness);
     }
 }
