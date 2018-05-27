@@ -12,6 +12,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 
+import com.example.shaperecognitiongame.shapes.Shape;
 import com.example.shaperecognitiongame.shapes.ShapeHelper;
 
 public class MainActivity extends AppCompatActivity {
@@ -20,6 +21,7 @@ public class MainActivity extends AppCompatActivity {
     public static final int NEW_GAME_REQUEST = 100;
 
     private View mMainLayout;
+    private ImageView mImageView;
     private int mVertices;
 
     @Override
@@ -28,6 +30,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         mMainLayout = findViewById(R.id.main_layout);
+        mImageView = findViewById(R.id.imageView);
         chooseNewShape();
 
         final Button button = findViewById(R.id.button);
@@ -46,11 +49,11 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void chooseNewShape() {
-        mVertices = ShapeHelper.getRandomShape().numberOfVertices();
+        Shape shape = ShapeHelper.getRandomShape();
+        mVertices = shape.numberOfVertices();
 
-        int shapeImage = ShapeHelper.getImageResource(mVertices);
-        ImageView imageView = findViewById(R.id.imageView);
-        imageView.setImageResource(shapeImage);
+        int imageResource = shape.imageResource();
+        mImageView.setImageResource(imageResource);
     }
 
     private void startCamera() {

@@ -6,4 +6,6 @@ public interface Shape {
     double maxCos();
 
     int numberOfVertices();
+
+    int imageResource();
 }

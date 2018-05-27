@@ -1,7 +1,5 @@
 package com.example.shaperecognitiongame.shapes;
 
-import com.example.shaperecognitiongame.R;
-
 import java.util.Random;
 
 public final class ShapeHelper {
@@ -37,18 +35,5 @@ public final class ShapeHelper {
         int index = random.nextInt(shapes.length);
 
         return shapes[index];
-    }
-
-    public static int getImageResource(int vertices) {
-        switch (vertices) {
-            case 3:
-                return R.mipmap.triangle;
-            case 4:
-                return R.mipmap.rectangle;
-            case 5:
-                return R.mipmap.pentagon;
-            default:
-                return R.mipmap.circle;
-        }
     }
 }

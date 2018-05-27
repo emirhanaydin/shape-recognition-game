@@ -1,5 +1,7 @@
 package com.example.shaperecognitiongame.shapes;
 
+import com.example.shaperecognitiongame.R;
+
 public class Circle implements Shape {
     @Override
     public double minCos() {
@@ -14,5 +16,10 @@ public class Circle implements Shape {
     @Override
     public int numberOfVertices() {
         return 0;
+    }
+
+    @Override
+    public int imageResource() {
+        return R.mipmap.circle;
     }
 }
